@@ -1,4 +1,4 @@
-package org.wso2.carbon.identity.oauth.dpop.listener;
+package org.wso2.carbon.identity.dpop.listener;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
@@ -6,7 +6,6 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.lang.StringUtils;
@@ -15,13 +14,13 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.core.handler.AbstractIdentityHandler;
 import org.wso2.carbon.identity.core.model.IdentityEventListenerConfig;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.dpop.util.OuthTokenType;
 import org.wso2.carbon.identity.oauth.event.AbstractOAuthEventInterceptor;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
-import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
+import org.wso2.carbon.identity.oauth2.dto.*;
 import org.wso2.carbon.identity.oauth2.model.HttpRequestHeader;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 import org.wso2.carbon.identity.oauth2.token.bindings.TokenBinding;
-import org.wso2.carbon.identity.oauth.dpop.util.TokenType;
 
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -32,8 +31,8 @@ import java.util.Map;
  * This class extends AbstractOAuthEventInterceptor and listen to oauth related events. In this class, dpop proof validation
  * will be handle for dpop type token requests
  */
-public class OAuthDPoPTokenEventHandler extends AbstractOAuthEventInterceptor {
-    private static final Log log = LogFactory.getLog(OAuthDPoPTokenEventHandler.class);
+public class OauthDPoPInterceptorHandlerProxy extends AbstractOAuthEventInterceptor {
+    private static final Log log = LogFactory.getLog(OauthDPoPInterceptorHandlerProxy.class);
 
     /**
      * This method handles stores token to session mapping during post token issuance. This is used by authorization
@@ -54,7 +53,7 @@ public class OAuthDPoPTokenEventHandler extends AbstractOAuthEventInterceptor {
         String dPopProof=null;
         HttpRequestHeader[] httpRequestHeaders = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getHttpRequestHeaders();
         for (HttpRequestHeader httpRequestHeader : httpRequestHeaders) {
-            if (TokenType.DPOP.name().equalsIgnoreCase(httpRequestHeader.getName())){
+            if (OuthTokenType.DPOP.name().equalsIgnoreCase(httpRequestHeader.getName())){
                 dPopProof = httpRequestHeader.getValue()[0];
                 break;
             }
@@ -78,6 +77,7 @@ public class OAuthDPoPTokenEventHandler extends AbstractOAuthEventInterceptor {
             }
         }
     }
+
     @Override
     public void onPreTokenRenewal(OAuth2AccessTokenReqDTO tokenReqDTO, OAuthTokenReqMessageContext tokReqMsgCtx,
                                   Map<String, Object> params) throws IdentityOAuth2Exception {
@@ -88,7 +88,7 @@ public class OAuthDPoPTokenEventHandler extends AbstractOAuthEventInterceptor {
         String dPopProof=null;
         HttpRequestHeader[] httpRequestHeaders = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getHttpRequestHeaders();
         for (HttpRequestHeader httpRequestHeader : httpRequestHeaders) {
-            if (TokenType.DPOP.name().equalsIgnoreCase(httpRequestHeader.getName())){
+            if (OuthTokenType.DPOP.name().equalsIgnoreCase(httpRequestHeader.getName())){
                 dPopProof = httpRequestHeader.getValue()[0];
                 break;
             }
@@ -112,6 +112,7 @@ public class OAuthDPoPTokenEventHandler extends AbstractOAuthEventInterceptor {
             }
         }
     }
+
     @Override
     public boolean isEnabled() {
         IdentityEventListenerConfig identityEventListenerConfig = IdentityUtil.readEventListenerProperty

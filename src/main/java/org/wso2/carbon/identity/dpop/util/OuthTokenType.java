@@ -1,13 +1,13 @@
-package org.wso2.carbon.identity.oauth.dpop.util;
+package org.wso2.carbon.identity.dpop.util;
 
-public enum TokenType {
+public enum OuthTokenType {
 
     BEARER("Bearer"),
     DPOP("DPoP");
 
     private String tokenTypeName;
 
-    TokenType(String tokenTypeName) {
+    OuthTokenType(String tokenTypeName) {
         this.tokenTypeName = tokenTypeName;
     }
 
